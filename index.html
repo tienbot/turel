@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <div id="realSizeElement">This should be 1cm x 2cm</div>
+        <img src="./img/all.svg" alt="">
+        <!-- <img src="./img/base.svg" alt="" class="base base-image" id="baseImage">
+        <img src="./img/left-side.svg" alt="" class="left-side">
+        <img src="./img/leg-connect.svg" alt="" class="leg-connect">
+        <img src="./img/leg.svg" alt="" class="leg">
+        <img src="./img/platform-round.svg" alt="" class="platform-round">
+        <img src="./img/ring.svg" alt="" class="ring">
+        <img src="./img/tur-base.svg" alt="" class="tur-base">
+        <img src="./img/tur-connect.svg" alt="" class="tur-connect">
+        <img src="./img/right-side.svg" alt="" class="right-side"> -->
+
+    <script>
+        function setElementSizeInCm(elementId, widthCm, heightCm) {
+            const devicePixelRatio = window.devicePixelRatio || 1;
+            const standardDPI = 127;
+            const dpi = devicePixelRatio * standardDPI; // Учитываем плотность пикселей
+            const cmToInches = 2.54;
+            const widthInPx = (widthCm / cmToInches) * dpi;
+            const heightInPx = (heightCm / cmToInches) * dpi;
+    
+            const element = document.getElementById(elementId);
+            element.style.width = `${widthInPx / devicePixelRatio}px`;
+            element.style.height = `${heightInPx / devicePixelRatio}px`;
+        }
+    
+        // Применяем размер для элемента с id 'realSizeElement'
+        setElementSizeInCm('realSizeElement', 1, 2);
+        // setElementSizeInCm('realSizeElement', 5.6, 5.6);
+    </script>
+
+</body>
+
+</html>
