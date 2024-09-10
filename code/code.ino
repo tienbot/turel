@@ -28,11 +28,13 @@ Servo xServo;
 Servo yServo;
 
 int currentAngle = 45;
+const int lazer = 8;   // Пин, к которому подключен лазер
 const int recv_pin = 9;   // Пин, к которому подключен ИК-приемник
 const int axisX_pin = 10;   // Пин, к которому подключен сервопривод оси X
-const int axisY_pin = 11;   // Пин, к которому подключен сервопривод оси Y   !!!!
+const int axisY_pin = 11;   // Пин, к которому подключен сервопривод оси Y
 const int fire_pin = 12;   // Пин, к которому подключен сервопривод пушки
 const int led_pin = 13;   // Пин, к которому подключен светодиод
+
 
 int pos = 65; // Начальная позиция (середина)
 bool ledState = false; // Состояние светодиода
@@ -162,10 +164,12 @@ void loop() {
 
 void LightOn() {
   digitalWrite(led_pin, HIGH);  // Включаем светодиод
+  digitalWrite(lazer, HIGH);  // Включаем лазер
 }
 
 void LightOff() {
   digitalWrite(led_pin, LOW);  // Отключаем светодиод
+  digitalWrite(lazer, LOW);  // Отключаем светодиод
 }
 
 void Fire() {
