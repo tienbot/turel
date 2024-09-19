@@ -39,6 +39,9 @@ const int led_pin = 13;   // Пин, к которому подключен св
 int pos = 65; // Начальная позиция (середина)
 bool ledState = false; // Состояние светодиода
 
+int dartsFired = 0;
+int pitchServoVal = 100;
+
 void setup() {
   Serial.begin(9600);
   IrReceiver.begin(recv_pin);  // Инициализация ИК-приемника без флага ENABLE_LED_FEEDBACK
@@ -85,6 +88,7 @@ void loop() {
 
       case blue:
         Serial.print("blue");
+        randomRoulette();
         break;
 
       case close:
@@ -114,7 +118,7 @@ void loop() {
 
       case left:
         Serial.print("left");
-        Left();
+        Left(1);
         break;
         
       case play:
@@ -124,7 +128,7 @@ void loop() {
         
       case right:
         Serial.print("right");
-        Right();
+        Right(1);
         break;
         
       case leftDown:
@@ -176,18 +180,39 @@ void Fire() {
   fireServo.write(0);  // Поворот пушки по часовой
   delay(88);         // Ждем, пока сервопривод достигнет этой позиции
   fireServo.write(90); // Останавливаем сервопривод
+  dartsFired++;
 }
 
-void Left() {
-  xServo.write(111);  // Поворот вправо на средней скорости (диапазон 91-180)
-  delay(88);         // Ждем, 88 милисекунд
-  xServo.write(90); // Останавливаем сервопривод
+// void Left() {
+//   xServo.write(111);  // Поворот вправо на средней скорости (диапазон 91-180)
+//   delay(88);         // Ждем, 88 милисекунд
+//   xServo.write(90); // Останавливаем сервопривод
+// }
+
+void Left(int moves){
+    for (int i = 0; i < moves; i++){
+        xServo.write(90 + 90); // adding the servo speed = 180 (full counterclockwise rotation speed)
+        delay(90); // stay rotating for a certain number of milliseconds
+        xServo.write(90); // stop rotating
+        delay(5); //delay for smoothness
+        Serial.println("LEFT");
+  }
 }
 
-void Right() {
-  xServo.write(69);  // Поворот влево на средней скорости (диапазон 89-0)
-  delay(88);         // Ждем, 88 милисекунд
-  xServo.write(90); // Останавливаем сервопривод
+// void Right() {
+//   xServo.write(69);  // Поворот влево на средней скорости (диапазон 89-0)
+//   delay(88);         // Ждем, 88 милисекунд
+//   xServo.write(90); // Останавливаем сервопривод
+// }
+
+void Right(int moves){ // function to move right
+  for (int i = 0; i < moves; i++){
+      xServo.write(90 - 90); //subtracting the servo speed = 0 (full clockwise rotation speed)
+      delay(90);
+      xServo.write(90);
+      delay(5);
+      Serial.println("RIGHT");
+  }
 }
 
 void Up() {
@@ -241,4 +266,59 @@ void shakeHeadNo(int moves) {
         xServo.write(90);
         delay(50); // Pause at starting position
     }
+}
+
+void fireAll(){ // this function fires all of the darts by spinning the barrel
+    fireServo.write(90 + 90);//start rotating the servo
+    delay(165 * 6); //time for 360 degrees of rotation
+    fireServo.write(90);//stop rotating the servo
+    delay(5); // delay for smoothness
+    Serial.println("FIRING ALL DARTS");
+    dartsFired = 6;
+  }
+
+void randomRoulette() {
+  Serial.println("ENTERING ROULETTE MODE");
+  //unsigned long startTime = millis();
+  dartsFired = 0;
+  while(dartsFired < 6){ //while we still have darts, stay within this while loop
+    if (dartsFired < 6){ // if we still have darts do stuff (this is redundancy to help break out of the while loop in case something weird happens)
+      //pitchServoVal = 110;
+      yServo.write(75); // set PITCH servo to flat angle
+      xServo.write(145); // set YAW to rotate slowly
+      delay(400); // rotating for a moment
+      xServo.write(90); // stop
+      delay(400 * random(1,4)); //wait for a random delay each time
+
+      if(random(3) == 0){ // you have a 1 in six chance of being hit
+        delay(700); 
+        if(random(2) == 0){ // 50% chance to either shake the head yes before firing or just fire
+          shakeHeadYes(3);
+          delay(150);
+          Fire(); // fire 1 dart
+          delay(100);
+        //} else if(random(6) == 0){
+        //   shakeHeadYes(3);
+        //   delay(50);
+        //   fireAll(); // fire all the darts
+        //   delay(50);
+        } else {
+          Fire(); // fire 1 dart
+          delay(50);
+        }
+      }else{
+        if(random(6) == 5){
+          delay(700);
+          shakeHeadNo(3);
+          delay(300);
+        } else{
+          delay(700);
+        }
+      }
+    } else{
+      xServo.write(90); // redundancy to stop the spinning and break out of the while loop
+      return;
+    }
+  }
+  xServo.write(90); // finally, stop the yaw movement
 }
